@@ -43,9 +43,10 @@ albedo_color = Color(0, 1, 0, 1)
 radius = 2.595
 height = 5.19
 
-[node name="Universe" type="Node3D" node_paths=PackedStringArray("central_body")]
+[node name="Universe" type="Node3D"]
 script = ExtResource("1_6q408")
-central_body = NodePath("HeavenlyBodies/Planet")
+num_steps = 350
+show_past_path = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_5gdbb")
@@ -66,7 +67,7 @@ mesh = SubResource("SphereMesh_6326s")
 skeleton = NodePath("../..")
 mass = 10000000000000.0
 radius = 4.44
-initial_velocity = Vector3(0, 0, 1.78)
+initial_velocity = Vector3(0, 0, 0)
 
 [node name="Satellite" parent="HeavenlyBodies" instance=ExtResource("2_nyc2w")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.278196, 18.273937, 1.5329332)
@@ -83,7 +84,7 @@ mesh = SubResource("SphereMesh_5w2eq")
 script = ExtResource("4_6326s")
 mass = 10000000000.0
 radius = 2.595
-initial_velocity = Vector3(2.34, 1.72, 0)
+initial_velocity = Vector3(1.59, 3.74, 0)
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
 [node name="Orbits" type="Node3D" parent="."]

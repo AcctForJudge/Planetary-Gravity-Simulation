@@ -10,15 +10,18 @@ const G = 6.67e-11
 @export var central_body: HeavenlyBody
 
 @export_category("Orbit Paths")
+## number of time steps in the future to calculate the paths
 @export_range(1, 200, 1, "or_greater") var num_steps := 200
-@export_range(0.01, 1, 0.01, "or_greater") var time_step : float = 0.01
+## affects actual simulation as well, not just for calculating paths
+@export_range(0.01, 0.1, 0.01) var time_step : float = 0.01
 
-
-
+@export var show_past_path := false
 
 var all_bodies : Array[HeavenlyBody]
 var play := false
-var orbits_shown := true
+var future_orbits_shown := true
+## like draw points but for past paths
+var body_positions: Array
 
 @onready var heavenly_bodies_container: Node3D = $HeavenlyBodies
 @onready var orbits: Node3D = $Orbits
@@ -27,34 +30,49 @@ func _ready() -> void:
 	for child in heavenly_bodies_container.get_children():
 		if child is HeavenlyBody:
 			all_bodies.append(child)
+			body_positions.append([])
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 	if !play:
 		hide_orbits()
-		draw_orbits()
+		if future_orbits_shown:
+			calculate_and_show_orbits()
 	else:
-		if orbits_shown:
-			hide_orbits()
-			draw_orbits()
+		if show_past_path:
+			show_past_orbits()
 		else:
-			hide_orbits()
+			if future_orbits_shown:
+				hide_orbits()
+				calculate_and_show_orbits()
+			else:
+				hide_orbits()
 		
 func _unhandled_input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("play"):
 		play = !play
 	if Input.is_action_just_pressed("hide"):
 		hide_orbits()
-		orbits_shown = !orbits_shown
+		future_orbits_shown = !future_orbits_shown
 	
 func _physics_process(_delta: float) -> void:
 	if play:
 		for body in all_bodies:
 			body.update_velocity(all_bodies, time_step)
-		for body in all_bodies:
+		for i in all_bodies.size():
+			var body = all_bodies[i]
 			body.update_position(time_step)
-		
-			
-func draw_orbits():
+			if body_positions[i].size() > 0:
+				if body_positions[i][-1] != body.position:
+					body_positions[i].append(body.position)
+			else:
+				body_positions[i].append(body.position)
+
+func show_past_orbits():
+	for i in body_positions.size():
+		draw_orbits(i, body_positions)
+
+func calculate_and_show_orbits():
 	var heavenly_bodies = all_bodies
 	
 	var virtual_bodies: Array[VirtualBody] = []
@@ -98,30 +116,33 @@ func draw_orbits():
 			
 	
 	for i in virtual_bodies.size():
-		var orbit := Path3D.new()
-		var curve := Curve3D.new()
-		
-		# some error occurs in the c++ source code when two successive points are the same
-		var prev_pos: Vector3 = Vector3.ZERO
-		for pos:Vector3 in draw_points[i]:
-			if pos != prev_pos:
-				curve.add_point(pos)
-			prev_pos = pos
-		orbit.curve = curve
-		orbits.add_child(orbit)
-		
-		var csg_polygon := CSGPolygon3D.new()
-		var points := PackedVector2Array()
-	
-		points.append(Vector2.ZERO)
-		points.append( Vector2(0, 0.1))
-		points.append(Vector2(0.1, 0.1))
-		points.append(Vector2(0.1, 0))
-		csg_polygon.polygon = points
+		draw_orbits(i, draw_points)
 
-		csg_polygon.mode = CSGPolygon3D.MODE_PATH
-		csg_polygon.path_node = orbit.get_path()
-		orbit.add_child(csg_polygon)
+func draw_orbits(i: int, draw_points: Array):
+	var orbit := Path3D.new()
+	var curve := Curve3D.new()
+	
+	# some error occurs in the c++ source code when two successive points are the same
+	var prev_pos: Vector3 = Vector3.ZERO
+	for pos:Vector3 in draw_points[i]:
+		if !pos.is_equal_approx(prev_pos):
+			curve.add_point(pos)
+		prev_pos = pos
+	orbit.curve = curve
+	orbits.add_child(orbit)
+	
+	var csg_polygon := CSGPolygon3D.new()
+	var points := PackedVector2Array()
+
+	points.append(Vector2.ZERO)
+	points.append( Vector2(0, 0.1))
+	points.append(Vector2(0.1, 0.1))
+	points.append(Vector2(0.1, 0))
+	csg_polygon.polygon = points
+
+	csg_polygon.mode = CSGPolygon3D.MODE_PATH
+	csg_polygon.path_node = orbit.get_path()
+	orbit.add_child(csg_polygon)
 
 func hide_orbits():
 	for child in orbits.get_children():
@@ -136,6 +157,7 @@ func calc_acc(i: int, virtual_bodies: Array[VirtualBody]):
 			var force := dir * G * virtual_bodies[j].vb_mass / sqr_dist # no need for i's mass cuz a = f/m
 			acc += force
 	return acc
+
 class VirtualBody:
 	# properties
 	var vb_mass: float
