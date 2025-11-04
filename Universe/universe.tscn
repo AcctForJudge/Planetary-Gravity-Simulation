@@ -43,9 +43,13 @@ albedo_color = Color(0, 1, 0, 1)
 radius = 2.595
 height = 5.19
 
-[node name="Universe" type="Node3D"]
+[node name="Universe" type="Node3D" node_paths=PackedStringArray("central_body")]
 script = ExtResource("1_6q408")
-num_steps = 1145
+relative_to_body = true
+central_body = NodePath("HeavenlyBodies/Planet")
+num_steps = 930
+time_step = 0.1
+orbit_mode = 1
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_5gdbb")

@@ -72,7 +72,9 @@ func _physics_process(_delta: float) -> void:
 					body_positions[i].append(body.position)
 			else:
 				body_positions[i].append(body.position)
-
+			
+			while body_positions[i].size() > num_steps:
+				body_positions[i].pop_front()
 func show_past_orbits():
 	for i in body_positions.size():
 		draw_orbits(i, body_positions)
