@@ -2,8 +2,13 @@
 class_name Universe
 extends Node3D
 
-const G = 6.67e-11
+enum Orbit {
+	FUTURE,
+	PAST,
+	NONE,
+}
 
+const G = 6.67e-11
 
 @export_category("Reference")
 @export var relative_to_body: bool = false
@@ -15,11 +20,12 @@ const G = 6.67e-11
 ## affects actual simulation as well, not just for calculating paths
 @export_range(0.01, 0.1, 0.01) var time_step : float = 0.01
 
-@export var show_past_path := false
+@export var orbit_mode: Orbit = Orbit.FUTURE
 
 var all_bodies : Array[HeavenlyBody]
 var play := false
-var future_orbits_shown := true
+var show_orbits := true
+var last_orbit_mode : Orbit
 ## like draw points but for past paths
 var body_positions: Array
 
@@ -34,18 +40,17 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	if !play:
-		hide_orbits()
-		if future_orbits_shown:
-			calculate_and_show_orbits()
-	else:
-		if show_past_path:
-			show_past_orbits()
-		else:
-			if future_orbits_shown:
+	if show_orbits:
+		match orbit_mode:
+			Orbit.FUTURE:
 				hide_orbits()
 				calculate_and_show_orbits()
-			else:
+				last_orbit_mode = Orbit.FUTURE
+			Orbit.PAST:
+				if last_orbit_mode == Orbit.FUTURE:
+					hide_orbits()
+				show_past_orbits()
+			Orbit.NONE:
 				hide_orbits()
 		
 func _unhandled_input(_event: InputEvent) -> void:
@@ -53,7 +58,7 @@ func _unhandled_input(_event: InputEvent) -> void:
 		play = !play
 	if Input.is_action_just_pressed("hide"):
 		hide_orbits()
-		future_orbits_shown = !future_orbits_shown
+		show_orbits = !show_orbits
 	
 func _physics_process(_delta: float) -> void:
 	if play:
