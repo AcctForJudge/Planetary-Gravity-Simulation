@@ -16,7 +16,7 @@ const G = 6.67e-11
 
 @export_category("Orbit Paths")
 ## number of time steps in the future to calculate the paths
-@export_range(1, 200, 1, "or_greater") var num_steps := 200
+@export_range(1, 200, 1, "or_greater") var num_steps := 500
 ## affects actual simulation as well, not just for calculating paths
 @export_range(0.01, 0.1, 0.01) var time_step : float = 0.01
 
@@ -75,6 +75,7 @@ func _physics_process(_delta: float) -> void:
 			
 			while body_positions[i].size() > num_steps:
 				body_positions[i].pop_front()
+				
 func show_past_orbits():
 	for i in body_positions.size():
 		draw_orbits(i, body_positions)
@@ -142,15 +143,22 @@ func draw_orbits(i: int, draw_points: Array):
 	var points := PackedVector2Array()
 
 	points.append(Vector2.ZERO)
-	points.append( Vector2(0, 0.1))
-	points.append(Vector2(0.1, 0.1))
-	points.append(Vector2(0.1, 0))
+	points.append( Vector2(0, 0.4))
+	points.append(Vector2(0.4, 0.4))
+	points.append(Vector2(0.4, 0))
 	csg_polygon.polygon = points
+
+	var material := StandardMaterial3D.new()
+	material.emission_enabled = true
+	material.emission_energy_multiplier = 1.5
+	material.emission = Color.WHEAT
+	csg_polygon.material_override = material
 
 	csg_polygon.mode = CSGPolygon3D.MODE_PATH
 	csg_polygon.path_node = orbit.get_path()
 	orbit.add_child(csg_polygon)
-
+	
+	
 func hide_orbits():
 	for child in orbits.get_children():
 			child.queue_free()
