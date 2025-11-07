@@ -18,16 +18,20 @@ const G = 6.67e-11
 ## number of time steps in the future to calculate the paths
 @export_range(1, 200, 1, "or_greater") var num_steps := 500
 ## affects actual simulation as well, not just for calculating paths
-@export_range(0.01, 0.1, 0.01) var time_step : float = 0.01
-
+@export_range(0.01, 0.1, 0.01, "or_greater") var time_step : float = 0.01
+## positions are added to array each process, but only the nth one will get added to the mesh
 @export var orbit_mode: Orbit = Orbit.FUTURE
 
+var orbit_mesh_steps := 2
 var all_bodies : Array[HeavenlyBody]
 var play := false
 var show_orbits := true
 var last_orbit_mode : Orbit
 ## like draw points but for past paths
 var body_positions: Array
+var orbits_array: Array[Path3D]
+var mesh_instances_array: Array[MeshInstance3D]
+var viewport : Viewport
 
 @onready var heavenly_bodies_container: Node3D = $HeavenlyBodies
 @onready var orbits: Node3D = $Orbits
@@ -35,31 +39,49 @@ var body_positions: Array
 func _ready() -> void:
 	for child in heavenly_bodies_container.get_children():
 		if child is HeavenlyBody:
+			var orbit := Path3D.new()
+			var mesh_instance := MeshInstance3D.new()
+			orbits.add_child(orbit)
+			var material := StandardMaterial3D.new()
+			material.emission_enabled = true
+			material.emission_energy_multiplier = 1.5
+			material.emission = Color.WHEAT
+			mesh_instance.material_override = material
+			orbit.add_child(mesh_instance)
+			orbits_array.append(orbit)
+			mesh_instances_array.append(mesh_instance)
+			
 			all_bodies.append(child)
 			body_positions.append([])
-
+	viewport = get_viewport()
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 	if show_orbits:
 		match orbit_mode:
 			Orbit.FUTURE:
-				hide_orbits()
-				calculate_and_show_orbits()
-				last_orbit_mode = Orbit.FUTURE
-			Orbit.PAST:
-				if last_orbit_mode == Orbit.FUTURE:
+				if play:
+					print("Future Mode is only for Editor")
+					orbit_mode = Orbit.NONE
+				else:
 					hide_orbits()
-				show_past_orbits()
+					calculate_and_show_orbits()
+					last_orbit_mode = Orbit.FUTURE
 			Orbit.NONE:
 				hide_orbits()
-		
+
+
 func _unhandled_input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("play"):
 		play = !play
 	if Input.is_action_just_pressed("hide"):
 		hide_orbits()
 		show_orbits = !show_orbits
-	
+	if Input.is_action_just_pressed("view_mode"):
+		match viewport.debug_draw:
+			0:
+				viewport.debug_draw = Viewport.DEBUG_DRAW_WIREFRAME
+			4:
+				viewport.debug_draw = Viewport.DEBUG_DRAW_DISABLED
 func _physics_process(_delta: float) -> void:
 	if play:
 		for body in all_bodies:
@@ -72,9 +94,14 @@ func _physics_process(_delta: float) -> void:
 					body_positions[i].append(body.position)
 			else:
 				body_positions[i].append(body.position)
-			
+
 			while body_positions[i].size() > num_steps:
 				body_positions[i].pop_front()
+		if show_orbits:
+			if orbit_mode == Orbit.PAST:
+				if last_orbit_mode == Orbit.FUTURE:
+					hide_orbits()
+				show_past_orbits()
 				
 func show_past_orbits():
 	for i in body_positions.size():
@@ -127,41 +154,30 @@ func calculate_and_show_orbits():
 		draw_orbits(i, draw_points)
 
 func draw_orbits(i: int, draw_points: Array):
-	var orbit := Path3D.new()
-	var curve := Curve3D.new()
-	
 	# some error occurs in the c++ source code when two successive points are the same
+	var dist = $Camera.position.distance_squared_to(orbits_array[i].position)
+	if dist < 2000:
+		orbit_mesh_steps = 2
+	elif dist < 4000:
+		orbit_mesh_steps = 3
+	else:
+		orbit_mesh_steps = 4
+			
 	var prev_pos: Vector3 = Vector3.ZERO
-	for pos:Vector3 in draw_points[i]:
-		if !pos.is_equal_approx(prev_pos):
+	var curve := Curve3D.new()
+	var c = 0
+	for pos: Vector3 in draw_points[i]:
+		if !pos.is_equal_approx(prev_pos) and c % orbit_mesh_steps == 0:
 			curve.add_point(pos)
+		c += 1
 		prev_pos = pos
-	orbit.curve = curve
-	orbits.add_child(orbit)
-	
-	var csg_polygon := CSGPolygon3D.new()
-	var points := PackedVector2Array()
-
-	points.append(Vector2.ZERO)
-	points.append( Vector2(0, 0.4))
-	points.append(Vector2(0.4, 0.4))
-	points.append(Vector2(0.4, 0))
-	csg_polygon.polygon = points
-
-	var material := StandardMaterial3D.new()
-	material.emission_enabled = true
-	material.emission_energy_multiplier = 1.5
-	material.emission = Color.WHEAT
-	csg_polygon.material_override = material
-
-	csg_polygon.mode = CSGPolygon3D.MODE_PATH
-	csg_polygon.path_node = orbit.get_path()
-	orbit.add_child(csg_polygon)
-	
-	
+	orbits_array[i].curve = curve
+	mesh_instances_array[i].mesh = generate_mesh(orbits_array[i])
+		
 func hide_orbits():
-	for child in orbits.get_children():
-			child.queue_free()
+	for i in orbits.get_child_count():
+		mesh_instances_array[i].mesh = null
+		
 
 func calc_acc(i: int, virtual_bodies: Array[VirtualBody]):
 	var acc := Vector3.ZERO
@@ -172,7 +188,67 @@ func calc_acc(i: int, virtual_bodies: Array[VirtualBody]):
 			var force := dir * G * virtual_bodies[j].vb_mass / sqr_dist # no need for i's mass cuz a = f/m
 			acc += force
 	return acc
+	
+func generate_mesh(path_3d: Path3D, thickness:= 0.1) -> ArrayMesh:
+	var st := SurfaceTool.new()
+	
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var curve := path_3d.curve
+	var v1 := Vector3(-1, -1, 0) * thickness
+	var v2 := Vector3(-1, 1, 0) * thickness
+	var v3 := Vector3(1, -1, 0) * thickness
+	var v4 := Vector3(1, 1, 0) * thickness
+	for i in curve.point_count - 1:
+		var p1 = curve.get_point_position(i)
+		var p2 = curve.get_point_position(i + 1)
+		
+		var i00 = p1 + v1
+		var i01 = p1 + v2
+		var i02 = p1 + v3
+		var i03 = p1 + v4
+		var i10 = p2 + v1
+		var i11 = p2 + v2
+		var i12 = p2 + v3
+		var i13 = p2 + v4
 
+		# bottom
+		st.add_vertex(i10)
+		st.add_vertex(i02)
+		st.add_vertex(i00)
+		
+		st.add_vertex(i10)
+		st.add_vertex(i12)
+		st.add_vertex(i02)
+		
+		# front
+		st.add_vertex(i12)
+		st.add_vertex(i03)
+		st.add_vertex(i02)
+		
+		st.add_vertex(i12)
+		st.add_vertex(i13)
+		st.add_vertex(i03)
+		
+		# top
+		st.add_vertex(i13)
+		st.add_vertex(i11)
+		st.add_vertex(i03)
+		
+		st.add_vertex(i03)
+		st.add_vertex(i11)
+		st.add_vertex(i01)
+		
+		# back
+		st.add_vertex(i01)
+		st.add_vertex(i10)
+		st.add_vertex(i00)
+		
+		st.add_vertex(i10)
+		st.add_vertex(i01)
+		st.add_vertex(i11)
+	var mesh := st.commit()
+	return mesh
+	
 class VirtualBody:
 	# properties
 	var vb_mass: float

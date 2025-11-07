@@ -28,7 +28,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		mouse_captured = false
 
 func _physics_process(_delta: float) -> void:
-
 	if Input.is_action_pressed("up"):
 		velocity.y = vertical_move
 	if Input.is_action_pressed("down"):

@@ -14,4 +14,3 @@ height = 2.0
 material_override = SubResource("StandardMaterial3D_j7b5l")
 mesh = SubResource("SphereMesh_uurpi")
 script = ExtResource("1_uurpi")
-initial_velocity = null
