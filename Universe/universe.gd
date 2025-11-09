@@ -8,7 +8,7 @@ enum Orbit {
 	NONE,
 }
 
-const G = 6.67e-11
+const G = 1#6.67e-11
 
 @export_category("Reference")
 @export var relative_to_body: bool = false
@@ -22,6 +22,10 @@ const G = 6.67e-11
 ## positions are added to array each process, but only the nth one will get added to the mesh
 @export var orbit_mode: Orbit = Orbit.FUTURE
 
+@export_category("generate_terrain Terrain")
+@export var generate_terrain := false
+@export var reset := false
+
 var orbit_mesh_steps := 2
 var all_bodies : Array[HeavenlyBody]
 var play := false
@@ -32,9 +36,9 @@ var body_positions: Array
 var orbits_array: Array[Path3D]
 var mesh_instances_array: Array[MeshInstance3D]
 var viewport : Viewport
-
 @onready var heavenly_bodies_container: Node3D = $HeavenlyBodies
 @onready var orbits: Node3D = $Orbits
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	for child in heavenly_bodies_container.get_children():
@@ -50,7 +54,6 @@ func _ready() -> void:
 			orbit.add_child(mesh_instance)
 			orbits_array.append(orbit)
 			mesh_instances_array.append(mesh_instance)
-			
 			all_bodies.append(child)
 			body_positions.append([])
 	viewport = get_viewport()
@@ -68,8 +71,20 @@ func _process(_delta: float) -> void:
 					last_orbit_mode = Orbit.FUTURE
 			Orbit.NONE:
 				hide_orbits()
-
-
+	if reset:
+		for body in heavenly_bodies_container.get_children():
+			body.mesh = SphereMesh.new()
+			body.mesh.radius = body.radius
+			body.mesh.height = body.radius * 2
+			body.collision_shape_3d.shape = SphereShape3D.new()
+			body.collision_shape_3d.shape.radius = body.radius
+		reset = false
+		
+	if generate_terrain:
+		for body in heavenly_bodies_container.get_children():
+			if !body.is_star:
+				body.generate()
+		generate_terrain = false
 func _unhandled_input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("play"):
 		play = !play
@@ -155,24 +170,24 @@ func calculate_and_show_orbits():
 
 func draw_orbits(i: int, draw_points: Array):
 	# some error occurs in the c++ source code when two successive points are the same
-	var dist = $Camera.position.distance_squared_to(orbits_array[i].position)
-	if dist < 2000:
-		orbit_mesh_steps = 2
-	elif dist < 4000:
-		orbit_mesh_steps = 3
-	else:
-		orbit_mesh_steps = 4
+	#var dist = $Camera.position.distance_squared_to(orbits_array[i].position)
+	#if dist < 2000:
+		#orbit_mesh_steps = 2
+	#elif dist < 4000:
+		#orbit_mesh_steps = 3
+	#else:
+		#orbit_mesh_steps = 4
 			
 	var prev_pos: Vector3 = Vector3.ZERO
 	var curve := Curve3D.new()
 	var c = 0
 	for pos: Vector3 in draw_points[i]:
-		if !pos.is_equal_approx(prev_pos) and c % orbit_mesh_steps == 0:
+		if !pos.is_equal_approx(prev_pos) and c % 2 == 0:
 			curve.add_point(pos)
 		c += 1
 		prev_pos = pos
 	orbits_array[i].curve = curve
-	mesh_instances_array[i].mesh = generate_mesh(orbits_array[i])
+	mesh_instances_array[i].mesh = generate_mesh(orbits_array[i], 0.3)
 		
 func hide_orbits():
 	for i in orbits.get_child_count():

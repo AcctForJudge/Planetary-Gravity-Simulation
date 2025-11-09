@@ -1,114 +1,128 @@
-[gd_scene load_steps=17 format=3 uid="uid://brx4cveefbkom"]
+[gd_scene load_steps=20 format=3 uid="uid://brx4cveefbkom"]
 
 [ext_resource type="Script" uid="uid://b5bfgoutmjrax" path="res://Universe/universe.gd" id="1_6q408"]
 [ext_resource type="Texture2D" uid="uid://c3whsjkev0age" path="res://Sky Panaromas/starmap_g4k.jpg" id="2_5gdbb"]
-[ext_resource type="PackedScene" uid="uid://irg3s83o3d8j" path="res://HeavenlyBody/heavenly_body.tscn" id="2_nyc2w"]
-[ext_resource type="PackedScene" uid="uid://xwftssu4hp7o" path="res://Camera/camera.tscn" id="3_h0gil"]
+[ext_resource type="PackedScene" uid="uid://dwipajhr0a2xp" path="res://SpaceShip/spaceship.tscn" id="4_5gdbb"]
 [ext_resource type="Script" uid="uid://6ab6gpfo0tx5" path="res://HeavenlyBody/heavenly_body.gd" id="4_6326s"]
 
-[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_xs1tn"]
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_5gdbb"]
 panorama = ExtResource("2_5gdbb")
 
-[sub_resource type="Sky" id="Sky_6326s"]
-sky_material = SubResource("PanoramaSkyMaterial_xs1tn")
+[sub_resource type="Sky" id="Sky_5gdbb"]
+sky_material = SubResource("PanoramaSkyMaterial_5gdbb")
 
 [sub_resource type="Environment" id="Environment_5gdbb"]
 background_mode = 1
 background_color = Color(0.07683582, 0.07683582, 0.0768358, 1)
-sky = SubResource("Sky_6326s")
+sky = SubResource("Sky_5gdbb")
 ambient_light_source = 3
-tonemap_mode = 2
-glow_enabled = true
-adjustment_enabled = true
+ssao_power = 0.016634947
+ssil_sharpness = 0.0
+ssil_normal_rejection = 0.0
+sdfgi_bounce_feedback = 0.0
+sdfgi_min_cell_size = 2.7112305
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5w2eq"]
-albedo_color = Color(1, 0.6156863, 0, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6326s"]
 emission_enabled = true
-emission = Color(1, 0.6156863, 0, 1)
-emission_energy_multiplier = 1.5
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 16.0
 
 [sub_resource type="SphereMesh" id="SphereMesh_6326s"]
-resource_local_to_scene = true
+radius = 100.0
+height = 200.0
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_xs1tn"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5w2eq"]
+albedo_color = Color(0, 0, 1, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_5gdbb"]
+radius = 20.0
+height = 40.0
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_wn7ko"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5gdbb"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_xs1tn"]
 radius = 50.0
 height = 100.0
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5gdbb"]
-resource_local_to_scene = true
-albedo_color = Color(0.21960784, 0, 1, 1)
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_5w2eq"]
 
-[sub_resource type="SphereMesh" id="SphereMesh_xs1tn"]
-resource_local_to_scene = true
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xs1tn"]
+albedo_color = Color(0.62152386, 0.62152386, 0.6215238, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_5w2eq"]
 radius = 10.0
 height = 20.0
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xs1tn"]
-albedo_color = Color(0, 1, 0, 1)
-
-[sub_resource type="SphereMesh" id="SphereMesh_5w2eq"]
-radius = 15.0
-height = 30.0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p3x1f"]
-
-[sub_resource type="SphereMesh" id="SphereMesh_wn7ko"]
-radius = 5.0
-height = 10.0
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_p3x1f"]
 
 [node name="Universe" type="Node3D" node_paths=PackedStringArray("central_body")]
 script = ExtResource("1_6q408")
 relative_to_body = true
-central_body = NodePath("HeavenlyBodies/Sun")
-time_step = 2.05
+central_body = NodePath("HeavenlyBodies/Planet2")
+orbit_mode = 2
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_5gdbb")
 
-[node name="Camera" parent="." instance=ExtResource("3_h0gil")]
-transform = Transform3D(1, 0, 0, 0, -4.3711385e-08, 0.99999994, 0, -0.99999994, -4.3711385e-08, -83.96838, 400, -2.7069511)
-move_speed = 100.0
-
 [node name="HeavenlyBodies" type="Node3D" parent="."]
 
-[node name="Sun" parent="HeavenlyBodies" instance=ExtResource("2_nyc2w")]
-material_override = SubResource("StandardMaterial3D_5w2eq")
-cast_shadow = 0
+[node name="Star" type="MeshInstance3D" parent="HeavenlyBodies"]
+material_override = SubResource("StandardMaterial3D_6326s")
 mesh = SubResource("SphereMesh_6326s")
-skeleton = NodePath("../..")
-mass = 100000000000000.0
-radius = 50.0
+script = ExtResource("4_6326s")
+mass = 100000.0
+radius = 100.0
+is_star = true
+fnl = SubResource("FastNoiseLite_xs1tn")
+metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
-[node name="OmniLight3D" type="OmniLight3D" parent="HeavenlyBodies/Sun"]
-light_energy = 16.0
+[node name="OmniLight3D" type="OmniLight3D" parent="HeavenlyBodies/Star"]
 omni_range = 4096.0
-omni_attenuation = 0.016
+omni_attenuation = 0.1
 
-[node name="Planet" parent="HeavenlyBodies" instance=ExtResource("2_nyc2w")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 306.598, 0, 1.533)
-material_override = SubResource("StandardMaterial3D_5gdbb")
-mesh = SubResource("SphereMesh_xs1tn")
-skeleton = NodePath("../Sun")
-mass = 100000000000.0
-radius = 10.0
-initial_velocity = Vector3(0, 0, 4.365)
+[node name="Planet" type="MeshInstance3D" parent="HeavenlyBodies"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1432.2361)
+material_override = SubResource("StandardMaterial3D_5w2eq")
+mesh = SubResource("SphereMesh_5gdbb")
+script = ExtResource("4_6326s")
+mass = 5000.0
+radius = 20.0
+initial_velocity = Vector3(-8.35, 0, 0)
+fnl = SubResource("FastNoiseLite_wn7ko")
+metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
 [node name="Planet2" type="MeshInstance3D" parent="HeavenlyBodies"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -441.08414, 0, -2.7069511)
-material_override = SubResource("StandardMaterial3D_xs1tn")
-mesh = SubResource("SphereMesh_5w2eq")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3301.1255)
+material_override = SubResource("StandardMaterial3D_5gdbb")
+mesh = SubResource("SphereMesh_xs1tn")
 script = ExtResource("4_6326s")
-mass = 1000000000000.0
-radius = 15.0
-initial_velocity = Vector3(0, 0, 4.095)
+mass = 5000.0
+radius = 50.0
+initial_velocity = Vector3(-5.13, 0, 0)
+fnl = SubResource("FastNoiseLite_5w2eq")
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
 [node name="Moon" type="MeshInstance3D" parent="HeavenlyBodies"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -378.3215, 0, -3.0947309)
-material_override = SubResource("StandardMaterial3D_p3x1f")
-mesh = SubResource("SphereMesh_wn7ko")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38397217, 0, -3196.603)
+material_override = SubResource("StandardMaterial3D_xs1tn")
+mesh = SubResource("SphereMesh_5w2eq")
 script = ExtResource("4_6326s")
-mass = 1000000000000.0
-radius = 5.0
-initial_velocity = Vector3(0, 0, 5.765)
+mass = 1000.0
+radius = 10.0
+initial_velocity = Vector3(-12.925, 0, 0)
+fnl = SubResource("FastNoiseLite_p3x1f")
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
 [node name="Orbits" type="Node3D" parent="."]
+
+[node name="SpaceShip" parent="." node_paths=PackedStringArray("body_containers", "universe") instance=ExtResource("4_5gdbb")]
+transform = Transform3D(-0.70211583, 0, -0.7120627, 0, 1, 0, 0.7120627, 0, -0.70211583, 0, 84.31015, -3319.0415)
+platform_on_leave = 2
+horizontal_speed = 10
+body_containers = NodePath("../HeavenlyBodies")
+universe = NodePath("..")

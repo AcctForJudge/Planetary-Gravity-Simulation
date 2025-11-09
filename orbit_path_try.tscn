@@ -1,8 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://cii7csyyi8p55"]
-
-[ext_resource type="Script" uid="uid://bhpplg8gflpp1" path="res://orbit_path_try.gd" id="1_c5cgp"]
-
-[node name="Node3D" type="Node3D" node_paths=PackedStringArray("path_3d")]
-script = ExtResource("1_c5cgp")
-points = Array[Vector3]([Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)])
-path_3d = NodePath("")
