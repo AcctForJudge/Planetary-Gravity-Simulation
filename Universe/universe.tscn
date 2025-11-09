@@ -123,6 +123,8 @@ metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 [node name="SpaceShip" parent="." node_paths=PackedStringArray("body_containers", "universe") instance=ExtResource("4_5gdbb")]
 transform = Transform3D(-0.70211583, 0, -0.7120627, 0, 1, 0, 0.7120627, 0, -0.70211583, 0, 84.31015, -3319.0415)
 platform_on_leave = 2
-horizontal_speed = 10
+horizontal_speed = 150
+vertical_speed = 240
 body_containers = NodePath("../HeavenlyBodies")
 universe = NodePath("..")
+vec = Vector3(0, -1, 0)

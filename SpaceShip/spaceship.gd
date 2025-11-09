@@ -1,3 +1,4 @@
+#@tool
 extends CharacterBody3D
 
 @export_category("speed")
@@ -9,6 +10,7 @@ extends CharacterBody3D
 @export var body_containers: Node3D
 @export var universe: Universe
 
+@export var vec: Vector3 = Vector3.DOWN
 var bodies: Array
 var look_rotation := Vector2.ZERO
 var mouse_captured := true
@@ -26,7 +28,6 @@ func _ready() -> void:
 	look_rotation.x = head.rotation.x
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	bodies = body_containers.get_children()
-	print(bodies)
 	
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and mouse_captured:
@@ -40,6 +41,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	handle_movement(delta)
+	print(should_add_gravity)
 	if universe.play and should_add_gravity:
 		var forces: Array = []
 		var strongest_force := Vector3.ZERO
@@ -49,24 +51,32 @@ func _physics_process(delta: float) -> void:
 			var dir = position.direction_to(body.position)
 			var force: Vector3 = dir * Universe.G * body.mass / sqr_dist # force = acc cuz mass cancel
 			forces.append(force)
+			#print(force)
 			if force.length_squared() > strongest_force.length_squared():
 				second_strongest_force = strongest_force
 				strongest_force = force
 				main_body = body
-		
+		#printt(strongest_force, second_strongest_force)
 		if strongest_force.length_squared() > second_strongest_force.length_squared() * 2:
 			velocity_from_gravity += strongest_force
-			
+			var gravity_up = -strongest_force.normalized()
+			motion_mode = CharacterBody3D.MOTION_MODE_GROUNDED
+			up_direction = gravity_up
+			#print("dom, ", main_body.name)
 		else:
 			velocity_from_gravity += sum(forces)
+			motion_mode = CharacterBody3D.MOTION_MODE_FLOATING
+			#print("sub")
 		#print()
+	#print(motion_mode)
+	#if motion_mode == CharacterBody3D.MOTION_MODE_GROUNDED:
+		#print(up_direction)
 	if universe.play and should_add_gravity:
 		velocity = velocity_from_gravity + velocity_from_movement
 	else:	
 		velocity = velocity_from_movement
-	#printt(velocity_from_movement, velocity_from_gravity)
-	#printt(velocity, velocity_from_gravity, velocity_from_movement)
-	print(should_add_gravity)
+
+	
 	move_and_slide()
 	
 func handle_movement(delta):
@@ -86,12 +96,12 @@ func handle_movement(delta):
 		thrust_forwards()
 	elif z < 0:
 		thrust_backwards()
-	velocity_from_movement.x = clamp(velocity_from_movement.x, -20, 20)
-	velocity_from_movement.y = clamp(velocity_from_movement.y, -20, 20)
-	velocity_from_movement.z = clamp(velocity_from_movement.z, -20, 20)
+	velocity_from_movement.x = clamp(velocity_from_movement.x, -100, 100)
+	velocity_from_movement.y = clamp(velocity_from_movement.y, -1000, 100)
+	velocity_from_movement.z = clamp(velocity_from_movement.z, -100, 100)
 	if !(x or y or z):
 		velocity_from_movement = lerp(velocity_from_movement, Vector3.ZERO, delta * 2)
-
+	
 
 func thrust_forwards():
 	velocity_from_movement += vertical_speed * -transform.basis.z
@@ -128,11 +138,8 @@ func sum(array: Array) -> Vector3:
 
 
 func _on_area_3d_body_entered(_body: Node3D) -> void:
-	print("entered")
-
 	should_add_gravity = false
 	velocity_from_gravity = Vector3.ZERO
 	
 func _on_area_3d_body_exited(_body: Node3D) -> void:
-	print_rich("[color=green]exitd[/color]")
 	should_add_gravity = true

@@ -12,13 +12,14 @@ size = Vector3(1.52, 0.61, 2.38)
 size = Vector3(1.52, 0.61, 2.38)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_py7oe"]
-size = Vector3(2, 1, 2.5)
+size = Vector3(2, 1.1928711, 2.9746094)
 
 [node name="SpaceShip" type="CharacterBody3D"]
 collision_layer = 2
 motion_mode = 1
 script = ExtResource("1_a5f6o")
 vertical_speed = 20
+vec = null
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 material_override = SubResource("StandardMaterial3D_a5f6o")
@@ -40,6 +41,7 @@ current = true
 [node name="Area3D" type="Area3D" parent="."]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.09643555, 0.01953125)
 shape = SubResource("BoxShape3D_py7oe")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
