@@ -2,23 +2,22 @@
 extends CharacterBody3D
 
 @export_category("speed")
-@export var horizontal_speed := 1
-@export var vertical_speed := 1
-@export var rot_speed := 1
+@export_range(0.1, 15, 0.1, "or_greater") var speed := 1.0
+@export_range(0.1, 2, 0.1) var rot_speed := 1.0
 @export var mouse_sense := 0.005
 @export_category("Bodies")
 @export var body_containers: Node3D
 @export var universe: Universe
-
-@export var vec: Vector3 = Vector3.DOWN
 var bodies: Array
-var look_rotation := Vector2.ZERO
+var look_rotation := Vector2.ZERO 
 var mouse_captured := true
 var velocity_from_gravity := Vector3.ZERO
 var velocity_from_movement := Vector3.ZERO
 var main_body : HeavenlyBody
 var should_add_gravity := true
 var yaw: float
+@onready var mesh: MeshInstance3D = $MeshInstance3D
+@onready var col: CollisionShape3D = $CollisionShape3D
 @onready var cam: Node3D = $Cam
 @onready var head: Node3D = $Cam/Head
 
@@ -41,42 +40,32 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	handle_movement(delta)
-	print(should_add_gravity)
-	if universe.play and should_add_gravity:
-		var forces: Array = []
+	if universe.play:
 		var strongest_force := Vector3.ZERO
-		var second_strongest_force := Vector3.ZERO
 		for body in bodies:
 			var sqr_dist = position.distance_squared_to(body.position)
 			var dir = position.direction_to(body.position)
 			var force: Vector3 = dir * Universe.G * body.mass / sqr_dist # force = acc cuz mass cancel
-			forces.append(force)
-			#print(force)
 			if force.length_squared() > strongest_force.length_squared():
-				second_strongest_force = strongest_force
 				strongest_force = force
 				main_body = body
-		#printt(strongest_force, second_strongest_force)
-		if strongest_force.length_squared() > second_strongest_force.length_squared() * 2:
-			velocity_from_gravity += strongest_force
-			var gravity_up = -strongest_force.normalized()
-			motion_mode = CharacterBody3D.MOTION_MODE_GROUNDED
-			up_direction = gravity_up
-			#print("dom, ", main_body.name)
-		else:
-			velocity_from_gravity += sum(forces)
-			motion_mode = CharacterBody3D.MOTION_MODE_FLOATING
-			#print("sub")
-		#print()
-	#print(motion_mode)
-	#if motion_mode == CharacterBody3D.MOTION_MODE_GROUNDED:
-		#print(up_direction)
-	if universe.play and should_add_gravity:
-		velocity = velocity_from_gravity + velocity_from_movement
-	else:	
-		velocity = velocity_from_movement
 
-	
+		if strongest_force.length_squared() > 1:
+			if velocity_from_gravity.length_squared() < 10:
+				velocity_from_gravity += strongest_force
+			
+			var gravity_up = -strongest_force.normalized()
+			basis = align_up(basis, gravity_up)
+			#mesh.basis = b
+			#print("dom ",basis)
+		else:
+			velocity_from_gravity = Vector3.ZERO
+			#print(basis)
+	#if universe.play and should_add_gravity:
+	velocity = velocity_from_gravity + velocity_from_movement
+	#else:	
+	#velocity = velocity_from_movement
+	#printt(velocity_from_gravity, velocity_from_movement)
 	move_and_slide()
 	
 func handle_movement(delta):
@@ -102,11 +91,10 @@ func handle_movement(delta):
 	if !(x or y or z):
 		velocity_from_movement = lerp(velocity_from_movement, Vector3.ZERO, delta * 2)
 	
-
 func thrust_forwards():
-	velocity_from_movement += vertical_speed * -transform.basis.z
+	velocity_from_movement += speed * -transform.basis.z
 func thrust_backwards():
-	velocity_from_movement += vertical_speed * transform.basis.z
+	velocity_from_movement += speed * transform.basis.z
 func thrust_left():
 	yaw -= rot_speed
 	rotation_degrees.y = lerp(rotation_degrees.y, yaw, rot_speed)
@@ -114,13 +102,16 @@ func thrust_right():
 	yaw += rot_speed
 	rotation_degrees.y = lerp(rotation_degrees.y, yaw, rot_speed)
 func thrust_up():
-	velocity_from_movement += vertical_speed * -transform.basis.y
+	if velocity_from_gravity.length() > 0:
+		velocity_from_movement += velocity_from_gravity.length() * -transform.basis.y
+	else:
+		velocity_from_movement += speed * -transform.basis.y
 func thrust_down():
-	velocity_from_movement += vertical_speed * transform.basis.y
+	velocity_from_movement += speed * transform.basis.y
 
 func rotate_look(rot_input : Vector2):
 	look_rotation.x -= rot_input.y * mouse_sense
-	look_rotation.x = clamp(look_rotation.x, deg_to_rad(-85), deg_to_rad(85))
+	#look_rotation.x = clamp(look_rotation.x, deg_to_rad(-85), deg_to_rad(85))
 	
 	look_rotation.y -= rot_input.x * mouse_sense
 	look_rotation.y = clamp(look_rotation.y, deg_to_rad(-85), deg_to_rad(85))
@@ -136,10 +127,32 @@ func sum(array: Array) -> Vector3:
 		s += i
 	return s
 
-
-func _on_area_3d_body_entered(_body: Node3D) -> void:
-	should_add_gravity = false
-	velocity_from_gravity = Vector3.ZERO
+func align_up(node_basis: Basis, normal: Vector3) -> Basis:
+	var result := Basis()
+	var s = node_basis.get_scale().abs()
 	
-func _on_area_3d_body_exited(_body: Node3D) -> void:
-	should_add_gravity = true
+	result.x = normal.cross(node_basis.z)
+	result.y = normal
+	result.z = node_basis.x.cross(normal)
+	
+	result = result.orthonormalized()
+	result.x *= s.x
+	result.y *= s.y
+	result.z *= s.z
+	return result
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

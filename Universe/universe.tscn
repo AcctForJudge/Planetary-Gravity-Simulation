@@ -41,6 +41,7 @@ radius = 20.0
 height = 40.0
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_wn7ko"]
+frequency = 1.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5gdbb"]
 albedo_color = Color(0, 1, 0, 1)
@@ -63,8 +64,14 @@ height = 20.0
 [node name="Universe" type="Node3D" node_paths=PackedStringArray("central_body")]
 script = ExtResource("1_6q408")
 relative_to_body = true
-central_body = NodePath("HeavenlyBodies/Planet2")
+central_body = NodePath("HeavenlyBodies/Star")
 orbit_mode = 2
+
+[node name="SpaceShip" parent="." node_paths=PackedStringArray("body_containers", "universe") instance=ExtResource("4_5gdbb")]
+transform = Transform3D(-0.99999994, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0, -0.99999994, -0.037073374, 84.31015, -3321.674)
+platform_on_leave = 2
+body_containers = NodePath("../HeavenlyBodies")
+universe = NodePath("..")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_5gdbb")
@@ -119,12 +126,3 @@ fnl = SubResource("FastNoiseLite_p3x1f")
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
 [node name="Orbits" type="Node3D" parent="."]
-
-[node name="SpaceShip" parent="." node_paths=PackedStringArray("body_containers", "universe") instance=ExtResource("4_5gdbb")]
-transform = Transform3D(-0.70211583, 0, -0.7120627, 0, 1, 0, 0.7120627, 0, -0.70211583, 0, 84.31015, -3319.0415)
-platform_on_leave = 2
-horizontal_speed = 150
-vertical_speed = 240
-body_containers = NodePath("../HeavenlyBodies")
-universe = NodePath("..")
-vec = Vector3(0, -1, 0)
