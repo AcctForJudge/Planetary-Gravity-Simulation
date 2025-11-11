@@ -1,9 +1,10 @@
 #@tool
 extends CharacterBody3D
-
+@export var b := Basis()
 @export_category("speed")
 @export_range(0.1, 15, 0.1, "or_greater") var speed := 1.0
 @export_range(0.1, 2, 0.1) var rot_speed := 1.0
+@export_range(0.1, 5, 0.1) var land_speed := 2.0
 @export var mouse_sense := 0.005
 @export_category("Bodies")
 @export var body_containers: Node3D
@@ -20,7 +21,7 @@ var yaw: float
 @onready var col: CollisionShape3D = $CollisionShape3D
 @onready var cam: Node3D = $Cam
 @onready var head: Node3D = $Cam/Head
-
+var prev_b := Basis()
 func _ready() -> void:
 	yaw = rotation_degrees.y
 	look_rotation.y = cam.rotation.y
@@ -55,17 +56,18 @@ func _physics_process(delta: float) -> void:
 				velocity_from_gravity += strongest_force
 			
 			var gravity_up = -strongest_force.normalized()
-			basis = align_up(basis, gravity_up)
+			basis = lerp(basis, align_up(basis, gravity_up), delta * land_speed)
+			
 			#mesh.basis = b
 			#print("dom ",basis)
 		else:
 			velocity_from_gravity = Vector3.ZERO
 			#print(basis)
-	#if universe.play and should_add_gravity:
 	velocity = velocity_from_gravity + velocity_from_movement
-	#else:	
-	#velocity = velocity_from_movement
-	#printt(velocity_from_gravity, velocity_from_movement)
+	#basis = b
+	if prev_b != basis:
+		print(basis)
+		prev_b = basis
 	move_and_slide()
 	
 func handle_movement(delta):
@@ -90,17 +92,15 @@ func handle_movement(delta):
 	velocity_from_movement.z = clamp(velocity_from_movement.z, -100, 100)
 	if !(x or y or z):
 		velocity_from_movement = lerp(velocity_from_movement, Vector3.ZERO, delta * 2)
-	
+	yaw = rotation.y
 func thrust_forwards():
 	velocity_from_movement += speed * -transform.basis.z
 func thrust_backwards():
 	velocity_from_movement += speed * transform.basis.z
 func thrust_left():
-	yaw -= rot_speed
-	rotation_degrees.y = lerp(rotation_degrees.y, yaw, rot_speed)
+	rotate_object_local(Vector3.UP, -rot_speed * 0.01)
 func thrust_right():
-	yaw += rot_speed
-	rotation_degrees.y = lerp(rotation_degrees.y, yaw, rot_speed)
+	rotate_object_local(Vector3.UP, rot_speed * 0.01)
 func thrust_up():
 	if velocity_from_gravity.length() > 0:
 		velocity_from_movement += velocity_from_gravity.length() * -transform.basis.y

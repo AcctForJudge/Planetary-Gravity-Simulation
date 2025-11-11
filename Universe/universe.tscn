@@ -1,9 +1,10 @@
-[gd_scene load_steps=20 format=3 uid="uid://brx4cveefbkom"]
+[gd_scene load_steps=21 format=3 uid="uid://brx4cveefbkom"]
 
 [ext_resource type="Script" uid="uid://b5bfgoutmjrax" path="res://Universe/universe.gd" id="1_6q408"]
 [ext_resource type="Texture2D" uid="uid://c3whsjkev0age" path="res://Sky Panaromas/starmap_g4k.jpg" id="2_5gdbb"]
 [ext_resource type="PackedScene" uid="uid://dwipajhr0a2xp" path="res://SpaceShip/spaceship.tscn" id="4_5gdbb"]
 [ext_resource type="Script" uid="uid://6ab6gpfo0tx5" path="res://HeavenlyBody/heavenly_body.gd" id="4_6326s"]
+[ext_resource type="Texture2D" uid="uid://b18whhc7hbfah" path="res://icon.svg" id="5_5gdbb"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_5gdbb"]
 panorama = ExtResource("2_5gdbb")
@@ -44,7 +45,10 @@ height = 40.0
 frequency = 1.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5gdbb"]
-albedo_color = Color(0, 1, 0, 1)
+albedo_texture = ExtResource("5_5gdbb")
+metallic_specular = 1.0
+roughness = 0.35
+emission_enabled = true
 
 [sub_resource type="SphereMesh" id="SphereMesh_xs1tn"]
 radius = 50.0
@@ -69,7 +73,6 @@ orbit_mode = 2
 
 [node name="SpaceShip" parent="." node_paths=PackedStringArray("body_containers", "universe") instance=ExtResource("4_5gdbb")]
 transform = Transform3D(-0.99999994, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0, -0.99999994, -0.037073374, 84.31015, -3321.674)
-platform_on_leave = 2
 body_containers = NodePath("../HeavenlyBodies")
 universe = NodePath("..")
 
