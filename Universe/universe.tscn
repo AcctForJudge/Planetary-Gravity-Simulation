@@ -1,10 +1,10 @@
 [gd_scene load_steps=21 format=3 uid="uid://brx4cveefbkom"]
 
 [ext_resource type="Script" uid="uid://b5bfgoutmjrax" path="res://Universe/universe.gd" id="1_6q408"]
-[ext_resource type="Texture2D" uid="uid://c3whsjkev0age" path="res://Sky Panaromas/starmap_g4k.jpg" id="2_5gdbb"]
+[ext_resource type="Texture2D" uid="uid://c3whsjkev0age" path="res://Textures/Sky Panaromas/starmap_g4k.jpg" id="2_5gdbb"]
 [ext_resource type="PackedScene" uid="uid://dwipajhr0a2xp" path="res://SpaceShip/spaceship.tscn" id="4_5gdbb"]
 [ext_resource type="Script" uid="uid://6ab6gpfo0tx5" path="res://HeavenlyBody/heavenly_body.gd" id="4_6326s"]
-[ext_resource type="Texture2D" uid="uid://b18whhc7hbfah" path="res://icon.svg" id="5_5gdbb"]
+[ext_resource type="Texture2D" uid="uid://dl46e8ngyl4fb" path="res://Textures/Prototype Textures/Red/texture_09.png" id="5_5gdbb"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_5gdbb"]
 panorama = ExtResource("2_5gdbb")
@@ -44,11 +44,8 @@ height = 40.0
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_wn7ko"]
 frequency = 1.0
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5gdbb"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p3x1f"]
 albedo_texture = ExtResource("5_5gdbb")
-metallic_specular = 1.0
-roughness = 0.35
-emission_enabled = true
 
 [sub_resource type="SphereMesh" id="SphereMesh_xs1tn"]
 radius = 50.0
@@ -108,7 +105,7 @@ metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
 [node name="Planet2" type="MeshInstance3D" parent="HeavenlyBodies"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3301.1255)
-material_override = SubResource("StandardMaterial3D_5gdbb")
+material_override = SubResource("StandardMaterial3D_p3x1f")
 mesh = SubResource("SphereMesh_xs1tn")
 script = ExtResource("4_6326s")
 mass = 5000.0

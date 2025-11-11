@@ -21,7 +21,7 @@ var yaw: float
 @onready var col: CollisionShape3D = $CollisionShape3D
 @onready var cam: Node3D = $Cam
 @onready var head: Node3D = $Cam/Head
-var prev_b := Basis()
+#var prev_b := Basis()
 func _ready() -> void:
 	yaw = rotation_degrees.y
 	look_rotation.y = cam.rotation.y
@@ -52,6 +52,7 @@ func _physics_process(delta: float) -> void:
 				main_body = body
 
 		if strongest_force.length_squared() > 1:
+			print(strongest_force)
 			if velocity_from_gravity.length_squared() < 10:
 				velocity_from_gravity += strongest_force
 			
@@ -65,20 +66,20 @@ func _physics_process(delta: float) -> void:
 			#print(basis)
 	velocity = velocity_from_gravity + velocity_from_movement
 	#basis = b
-	if prev_b != basis:
-		print(basis)
-		prev_b = basis
+	#if prev_b != basis:
+		#print(basis)
+		#prev_b = basis
 	move_and_slide()
 	
 func handle_movement(delta):
 	var x = Input.get_axis("left", "right")
 	var z = Input.get_axis("backward", "forward")
 	var y = Input.get_axis("up", "down")
-	
+	var idk = Input.get_action_strength("look_up") - Input.get_action_strength("look_down")
 	if x > 0:
-		thrust_left()
+		rotate_left()
 	elif x < 0:
-		thrust_right()
+		rotate_right()
 	if y > 0:
 		thrust_up()
 	elif y < 0:
@@ -87,6 +88,10 @@ func handle_movement(delta):
 		thrust_forwards()
 	elif z < 0:
 		thrust_backwards()
+	if idk > 0:
+		rotate_up()
+	elif idk < 0:
+		rotate_down()
 	velocity_from_movement.x = clamp(velocity_from_movement.x, -100, 100)
 	velocity_from_movement.y = clamp(velocity_from_movement.y, -1000, 100)
 	velocity_from_movement.z = clamp(velocity_from_movement.z, -100, 100)
@@ -97,9 +102,9 @@ func thrust_forwards():
 	velocity_from_movement += speed * -transform.basis.z
 func thrust_backwards():
 	velocity_from_movement += speed * transform.basis.z
-func thrust_left():
+func rotate_left():
 	rotate_object_local(Vector3.UP, -rot_speed * 0.01)
-func thrust_right():
+func rotate_right():
 	rotate_object_local(Vector3.UP, rot_speed * 0.01)
 func thrust_up():
 	if velocity_from_gravity.length() > 0:
@@ -108,7 +113,10 @@ func thrust_up():
 		velocity_from_movement += speed * -transform.basis.y
 func thrust_down():
 	velocity_from_movement += speed * transform.basis.y
-
+func rotate_up():
+	rotate_object_local(Vector3.RIGHT, -rot_speed * 0.01)
+func rotate_down():
+	rotate_object_local(Vector3.RIGHT, rot_speed * 0.01)
 func rotate_look(rot_input : Vector2):
 	look_rotation.x -= rot_input.y * mouse_sense
 	#look_rotation.x = clamp(look_rotation.x, deg_to_rad(-85), deg_to_rad(85))
