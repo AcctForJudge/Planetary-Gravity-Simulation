@@ -22,7 +22,7 @@ extends MeshInstance3D
 	set(value):
 		fnl = value
 		#generate()
-
+@export var height_scale := 5.0
 var velocity := Vector3.ZERO
 var mdt = MeshDataTool.new()
 
@@ -56,7 +56,7 @@ func generate():
 	for i in range(mdt.get_vertex_count()):
 		var vertex = mdt.get_vertex(i).normalized()
 		# Push out vertex by noise.
-		vertex = vertex * (pow(2, fnl.get_noise_3dv(vertex) * 2)+ radius) 
+		vertex = vertex * (pow(2, fnl.get_noise_3dv(vertex) * height_scale) + radius) 
 		mdt.set_vertex(i, vertex)
 
 	# Calculate vertex normals, face-by-face.

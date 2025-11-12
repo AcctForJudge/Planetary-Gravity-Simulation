@@ -51,8 +51,8 @@ func _physics_process(delta: float) -> void:
 				strongest_force = force
 				main_body = body
 
-		if strongest_force.length_squared() > 1:
-			print(strongest_force)
+		if strongest_force.length_squared() > 1 or main_body.position.distance_squared_to(position) < pow(main_body.radius * 1.5, 2):
+			#print(strongest_force)
 			if velocity_from_gravity.length_squared() < 10:
 				velocity_from_gravity += strongest_force
 			
