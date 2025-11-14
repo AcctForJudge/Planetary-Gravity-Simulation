@@ -21,6 +21,7 @@ var yaw: float
 @onready var col: CollisionShape3D = $CollisionShape3D
 @onready var cam: Node3D = $Cam
 @onready var head: Node3D = $Cam/Head
+@onready var camera_3d: Camera3D = $Cam/Head/Camera3D
 #var prev_b := Basis()
 func _ready() -> void:
 	yaw = rotation_degrees.y
@@ -30,6 +31,8 @@ func _ready() -> void:
 	bodies = body_containers.get_children()
 	
 func _unhandled_input(event: InputEvent) -> void:
+	if universe.viewing_from != Universe.Camera.SPACESHIP:
+		return
 	if event is InputEventMouseMotion and mouse_captured:
 		rotate_look(event.relative)
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
@@ -72,6 +75,8 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	
 func handle_movement(delta):
+	if universe.viewing_from != Universe.Camera.SPACESHIP:
+		return
 	var x = Input.get_axis("left", "right")
 	var z = Input.get_axis("backward", "forward")
 	var y = Input.get_axis("up", "down")
@@ -104,8 +109,10 @@ func thrust_backwards():
 	velocity_from_movement += speed * transform.basis.z
 func rotate_left():
 	rotate_object_local(Vector3.UP, -rot_speed * 0.01)
+	universe.player.rotate_object_local(Vector3.UP, -rot_speed * 0.01)
 func rotate_right():
 	rotate_object_local(Vector3.UP, rot_speed * 0.01)
+	universe.player.rotate_object_local(Vector3.UP, rot_speed * 0.01)
 func thrust_up():
 	if velocity_from_gravity.length() > 0:
 		velocity_from_movement += velocity_from_gravity.length() * -transform.basis.y
@@ -115,8 +122,10 @@ func thrust_down():
 	velocity_from_movement += speed * transform.basis.y
 func rotate_up():
 	rotate_object_local(Vector3.RIGHT, -rot_speed * 0.01)
+	universe.player.rotate_object_local(Vector3.RIGHT, -rot_speed * 0.01)
 func rotate_down():
 	rotate_object_local(Vector3.RIGHT, rot_speed * 0.01)
+	universe.player.rotate_object_local(Vector3.RIGHT, rot_speed * 0.01)
 func rotate_look(rot_input : Vector2):
 	look_rotation.x -= rot_input.y * mouse_sense
 	#look_rotation.x = clamp(look_rotation.x, deg_to_rad(-85), deg_to_rad(85))

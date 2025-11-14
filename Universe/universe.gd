@@ -2,10 +2,17 @@
 class_name Universe
 extends Node3D
 
+signal camera_changed(new_camera: Camera)
+
 enum Orbit {
 	FUTURE,
 	PAST,
 	NONE,
+}
+
+enum Camera {
+	SPACESHIP,
+	PLAYER,
 }
 
 const G = 1#6.67e-11
@@ -35,9 +42,13 @@ var last_orbit_mode : Orbit
 var body_positions: Array
 var orbits_array: Array[Path3D]
 var mesh_instances_array: Array[MeshInstance3D]
-var viewport : Viewport
+var viewport: Viewport
+var viewing_from := Camera.SPACESHIP
+
 @onready var heavenly_bodies_container: Node3D = $HeavenlyBodies
 @onready var orbits: Node3D = $Orbits
+@onready var space_ship: CharacterBody3D = $SpaceShip
+@onready var player: CharacterBody3D = $Player
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -97,6 +108,16 @@ func _unhandled_input(_event: InputEvent) -> void:
 				viewport.debug_draw = Viewport.DEBUG_DRAW_WIREFRAME
 			4:
 				viewport.debug_draw = Viewport.DEBUG_DRAW_DISABLED
+	if Input.is_action_just_pressed("change_camera"):
+		if viewing_from == Camera.SPACESHIP:
+			viewing_from = Camera.PLAYER
+			player.camera_3d.make_current()
+		elif viewing_from == Camera.PLAYER:
+			viewing_from = Camera.SPACESHIP
+			space_ship.camera_3d.make_current()
+		camera_changed.emit(viewing_from)
+		print(viewing_from)
+
 func _physics_process(_delta: float) -> void:
 	if play:
 		for body in all_bodies:
@@ -193,7 +214,6 @@ func hide_orbits():
 	for i in orbits.get_child_count():
 		mesh_instances_array[i].mesh = null
 		
-
 func calc_acc(i: int, virtual_bodies: Array[VirtualBody]):
 	var acc := Vector3.ZERO
 	for j in virtual_bodies.size():

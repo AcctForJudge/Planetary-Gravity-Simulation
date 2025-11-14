@@ -27,6 +27,7 @@ var velocity := Vector3.ZERO
 var mdt = MeshDataTool.new()
 
 var collision_shape_3d := CollisionShape3D.new()
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	var col := StaticBody3D.new()

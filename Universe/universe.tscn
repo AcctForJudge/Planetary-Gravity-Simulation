@@ -1,10 +1,11 @@
-[gd_scene load_steps=21 format=4 uid="uid://brx4cveefbkom"]
+[gd_scene load_steps=22 format=4 uid="uid://brx4cveefbkom"]
 
 [ext_resource type="Script" uid="uid://b5bfgoutmjrax" path="res://Universe/universe.gd" id="1_6q408"]
 [ext_resource type="Texture2D" uid="uid://c3whsjkev0age" path="res://Textures/Sky Panaromas/starmap_g4k.jpg" id="2_5gdbb"]
 [ext_resource type="PackedScene" uid="uid://dwipajhr0a2xp" path="res://SpaceShip/spaceship.tscn" id="4_5gdbb"]
 [ext_resource type="Script" uid="uid://6ab6gpfo0tx5" path="res://HeavenlyBody/heavenly_body.gd" id="4_6326s"]
 [ext_resource type="Texture2D" uid="uid://dl46e8ngyl4fb" path="res://Textures/Prototype Textures/Red/texture_09.png" id="5_5gdbb"]
+[ext_resource type="PackedScene" uid="uid://jbpgclbnijh5" path="res://Player/player.tscn" id="6_xs1tn"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_5gdbb"]
 panorama = ExtResource("2_5gdbb")
@@ -104,6 +105,11 @@ transform = Transform3D(-0.99999994, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0,
 body_containers = NodePath("../HeavenlyBodies")
 universe = NodePath("..")
 
+[node name="Player" parent="." node_paths=PackedStringArray("body_containers", "universe") instance=ExtResource("6_xs1tn")]
+transform = Transform3D(-0.39, 0, -3.409488e-08, 0, 0.39, 0, 3.409488e-08, 0, -0.39, -0.046138808, 904.9861, -1503.5511)
+body_containers = NodePath("../HeavenlyBodies")
+universe = NodePath("..")
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_5gdbb")
 
@@ -117,7 +123,6 @@ mass = 1000000.0
 radius = 200.0
 is_star = true
 fnl = SubResource("FastNoiseLite_xs1tn")
-height_scale = null
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
 [node name="OmniLight3D" type="OmniLight3D" parent="HeavenlyBodies/Star"]
@@ -133,7 +138,6 @@ mass = 50000.0
 radius = 80.0
 initial_velocity = Vector3(-25.495, 0, 0)
 fnl = SubResource("FastNoiseLite_wn7ko")
-height_scale = null
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
 [node name="Planet2" type="MeshInstance3D" parent="HeavenlyBodies"]
@@ -157,7 +161,6 @@ mass = 1000.0
 radius = 15.0
 initial_velocity = Vector3(6.235, 0, 0)
 fnl = SubResource("FastNoiseLite_p3x1f")
-height_scale = null
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
 [node name="Orbits" type="Node3D" parent="."]
