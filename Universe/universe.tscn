@@ -107,6 +107,7 @@ universe = NodePath("..")
 
 [node name="Player" parent="." node_paths=PackedStringArray("body_containers", "universe") instance=ExtResource("6_xs1tn")]
 transform = Transform3D(-0.39, 0, -3.409488e-08, 0, 0.39, 0, 3.409488e-08, 0, -0.39, -0.046138808, 904.9861, -1503.5511)
+move_speed = 798.9
 body_containers = NodePath("../HeavenlyBodies")
 universe = NodePath("..")
 

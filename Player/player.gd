@@ -70,12 +70,11 @@ func _physics_process(_delta: float) -> void:
 func handle_movement():
 	if universe.viewing_from != Universe.Camera.PLAYER:
 		return
-	var x = Input.get_axis("left", "right")
-	var z = Input.get_axis("backward", "forward")
 
-	# Handle jump.
-	#if Input.is_action_just_pressed("ui_accept") and is_on_floor():
-		#velocity.y = JUMP_VELOCITY
+	
+	var y = Input.get_axis("down", "up")
+	
+	velocity_from_movement.y = y * move_speed
 
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
