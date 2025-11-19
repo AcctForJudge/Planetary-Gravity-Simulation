@@ -1,4 +1,5 @@
 #@tool
+class_name Player
 extends CharacterBody3D
 
 @export_category("speed")
@@ -19,12 +20,11 @@ var should_add_gravity := true
 
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var col: CollisionShape3D = $CollisionShape3D
-@onready var cam: Node3D = $Cam
-@onready var head: Node3D = $Cam/Head
-@onready var camera_3d: Camera3D = $Cam/Head/Camera3D
+@onready var head: Node3D = $Head
+@onready var camera_3d: Camera3D = $Head/Camera3D
 
 func _ready() -> void:
-	look_rotation.y = cam.rotation.y
+	look_rotation.y = rotation.y
 	look_rotation.x = head.rotation.x
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	bodies = body_containers.get_children()
@@ -41,8 +41,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		mouse_captured = false
 
-func _physics_process(_delta: float) -> void:
+func _process(_delta: float) -> void:
 	handle_movement()
+
+func _physics_process(_delta: float) -> void:
 	if universe.play:
 		var strongest_force := Vector3.ZERO
 		for body in bodies:
@@ -53,27 +55,27 @@ func _physics_process(_delta: float) -> void:
 				strongest_force = force
 				main_body = body
 
-		if strongest_force.length_squared() > 1 or main_body.position.distance_squared_to(position) < pow(main_body.radius * 1.5, 2):
+		if strongest_force.length_squared() > 1 and universe.space_ship.grounded:
 			if velocity_from_gravity.length_squared() < 10:
 				velocity_from_gravity += strongest_force
 			
-			var gravity_up = -strongest_force.normalized()
+			var gravity_up = strongest_force.normalized()
+			
 			basis = align_up(basis, gravity_up)
 			
 		else:
 			velocity_from_gravity = Vector3.ZERO
-			var gravity_up = position.direction_to(universe.space_ship.position)
-			basis = align_up(basis, gravity_up)
-	velocity = velocity_from_gravity + velocity_from_movement + universe.space_ship.velocity
+	if !universe.space_ship.grounded:
+		position = universe.space_ship.player_pos.global_position
+	else:
+		velocity = velocity_from_gravity + velocity_from_movement
 	move_and_slide()
 	
 func handle_movement():
 	if universe.viewing_from != Universe.Camera.PLAYER:
 		return
 
-	
 	var y = Input.get_axis("down", "up")
-	
 	velocity_from_movement.y = y * move_speed
 
 	# Get the input direction and handle the movement/deceleration.

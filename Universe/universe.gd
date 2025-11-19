@@ -2,8 +2,6 @@
 class_name Universe
 extends Node3D
 
-signal camera_changed(new_camera: Camera)
-
 enum Orbit {
 	FUTURE,
 	PAST,
@@ -47,8 +45,8 @@ var viewing_from := Camera.SPACESHIP
 
 @onready var heavenly_bodies_container: Node3D = $HeavenlyBodies
 @onready var orbits: Node3D = $Orbits
-@onready var space_ship: CharacterBody3D = $SpaceShip
-@onready var player: CharacterBody3D = $Player
+@onready var space_ship: SpaceShip = $SpaceShip
+@onready var player: Player = $Player
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -109,14 +107,13 @@ func _unhandled_input(_event: InputEvent) -> void:
 			4:
 				viewport.debug_draw = Viewport.DEBUG_DRAW_DISABLED
 	if Input.is_action_just_pressed("change_camera"):
-		if viewing_from == Camera.SPACESHIP:
-			viewing_from = Camera.PLAYER
-			player.camera_3d.make_current()
-		elif viewing_from == Camera.PLAYER:
-			viewing_from = Camera.SPACESHIP
-			space_ship.camera_3d.make_current()
-		camera_changed.emit(viewing_from)
-		print(viewing_from)
+		if space_ship.grounded:
+			if viewing_from == Camera.SPACESHIP:
+				viewing_from = Camera.PLAYER
+				player.camera_3d.make_current()
+			elif viewing_from == Camera.PLAYER:
+				viewing_from = Camera.SPACESHIP
+				space_ship.camera_3d.make_current()
 
 func _physics_process(_delta: float) -> void:
 	if play:

@@ -1,6 +1,6 @@
 #@tool
+class_name SpaceShip
 extends CharacterBody3D
-@export var b := Basis()
 @export_category("speed")
 @export_range(0.1, 15, 0.1, "or_greater") var speed := 1.0
 @export_range(0.1, 2, 0.1) var rot_speed := 1.0
@@ -17,12 +17,15 @@ var velocity_from_movement := Vector3.ZERO
 var main_body : HeavenlyBody
 var should_add_gravity := true
 var yaw: float
+var grounded := false
+
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var col: CollisionShape3D = $CollisionShape3D
 @onready var cam: Node3D = $Cam
 @onready var head: Node3D = $Cam/Head
 @onready var camera_3d: Camera3D = $Cam/Head/Camera3D
-#var prev_b := Basis()
+@onready var player_pos: Marker3D = $Marker3D
+
 func _ready() -> void:
 	yaw = rotation_degrees.y
 	look_rotation.y = cam.rotation.y
@@ -42,8 +45,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		mouse_captured = false
 
-func _physics_process(delta: float) -> void:
+func _process(delta: float) -> void:
 	handle_movement(delta)
+
+func _physics_process(delta: float) -> void:
 	if universe.play:
 		var strongest_force := Vector3.ZERO
 		for body in bodies:
@@ -61,12 +66,13 @@ func _physics_process(delta: float) -> void:
 			
 			var gravity_up = -strongest_force.normalized()
 			basis = lerp(basis, align_up(basis, gravity_up), delta * land_speed)
-			
+			check_if_grounded(main_body)
 			#mesh.basis = b
 			#print("dom ",basis)
 		else:
 			velocity_from_gravity = Vector3.ZERO
 			#print(basis)
+			
 	velocity = velocity_from_gravity + velocity_from_movement
 	#basis = b
 	#if prev_b != basis:
@@ -78,8 +84,8 @@ func handle_movement(delta):
 	if universe.viewing_from != Universe.Camera.SPACESHIP:
 		return
 	var x = Input.get_axis("left", "right")
-	var z = Input.get_axis("backward", "forward")
 	var y = Input.get_axis("up", "down")
+	var z = Input.get_axis("backward", "forward")
 	var idk = Input.get_action_strength("look_up") - Input.get_action_strength("look_down")
 	if x > 0:
 		rotate_left()
@@ -103,6 +109,7 @@ func handle_movement(delta):
 	if !(x or y or z):
 		velocity_from_movement = lerp(velocity_from_movement, Vector3.ZERO, delta * 2)
 	yaw = rotation.y
+	
 func thrust_forwards():
 	velocity_from_movement += speed * -transform.basis.z
 func thrust_backwards():
@@ -114,12 +121,12 @@ func rotate_right():
 	rotate_object_local(Vector3.UP, rot_speed * 0.01)
 	universe.player.rotate_object_local(Vector3.UP, rot_speed * 0.01)
 func thrust_up():
-	if velocity_from_gravity.length() > 0:
-		velocity_from_movement += velocity_from_gravity.length() * -transform.basis.y
-	else:
-		velocity_from_movement += speed * -transform.basis.y
+	#if velocity_from_gravity.length() > 0:
+		#velocity_from_movement += velocity_from_gravity.length() * -transform.basis.y
+	#else:
+	velocity_from_movement = speed * -transform.basis.y
 func thrust_down():
-	velocity_from_movement += speed * transform.basis.y
+	velocity_from_movement = speed * transform.basis.y
 func rotate_up():
 	rotate_object_local(Vector3.RIGHT, -rot_speed * 0.01)
 	universe.player.rotate_object_local(Vector3.RIGHT, -rot_speed * 0.01)
@@ -158,9 +165,12 @@ func align_up(node_basis: Basis, normal: Vector3) -> Basis:
 	result.z *= s.z
 	return result
 	
-	
-	
-	
+func check_if_grounded(body: HeavenlyBody):
+	if body.position.distance_to(position) + 0.3 <= body.radius: # 0.3 is y length of spaceship	
+		grounded = true
+	else:
+		grounded = false
+	print(grounded)
 	
 	
 	
