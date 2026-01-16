@@ -41,12 +41,13 @@ var body_positions: Array
 var orbits_array: Array[Path3D]
 var mesh_instances_array: Array[MeshInstance3D]
 var viewport: Viewport
-var viewing_from := Camera.SPACESHIP
+var viewing_from := Camera.PLAYER
 
 @onready var heavenly_bodies_container: Node3D = $HeavenlyBodies
 @onready var orbits: Node3D = $Orbits
 @onready var space_ship: SpaceShip = $SpaceShip
 @onready var player: Player = $Player
+@onready var label: Label = $CanvasLayer/Control/Label
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -66,6 +67,7 @@ func _ready() -> void:
 			all_bodies.append(child)
 			body_positions.append([])
 	viewport = get_viewport()
+	player.camera_3d.make_current()
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 	if show_orbits:
@@ -97,6 +99,11 @@ func _process(_delta: float) -> void:
 func _unhandled_input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("play"):
 		play = !play
+		if label.text == "":
+			label.text = "Press P to start gravity"
+		else:
+			label.text = ""
+		print(label.text)
 	if Input.is_action_just_pressed("hide"):
 		hide_orbits()
 		show_orbits = !show_orbits
@@ -106,14 +113,14 @@ func _unhandled_input(_event: InputEvent) -> void:
 				viewport.debug_draw = Viewport.DEBUG_DRAW_WIREFRAME
 			4:
 				viewport.debug_draw = Viewport.DEBUG_DRAW_DISABLED
-	if Input.is_action_just_pressed("change_camera"):
-		if space_ship.grounded:
-			if viewing_from == Camera.SPACESHIP:
-				viewing_from = Camera.PLAYER
-				player.camera_3d.make_current()
-			elif viewing_from == Camera.PLAYER:
-				viewing_from = Camera.SPACESHIP
-				space_ship.camera_3d.make_current()
+	#if Input.is_action_just_pressed("change_camera"):
+		#if space_ship.grounded:
+			#if viewing_from == Camera.SPACESHIP:
+				#viewing_from = Camera.PLAYER
+				#player.camera_3d.make_current()
+			#elif viewing_from == Camera.PLAYER:
+				#viewing_from = Camera.SPACESHIP
+				#space_ship.camera_3d.make_current()
 
 func _physics_process(_delta: float) -> void:
 	if play:

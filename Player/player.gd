@@ -45,30 +45,32 @@ func _process(_delta: float) -> void:
 	handle_movement()
 
 func _physics_process(_delta: float) -> void:
-	if universe.play:
-		var strongest_force := Vector3.ZERO
-		for body in bodies:
-			var sqr_dist = position.distance_squared_to(body.position)
-			var dir = position.direction_to(body.position)
-			var force: Vector3 = dir * Universe.G * body.mass / sqr_dist # force = acc cuz mass cancel
-			if force.length_squared() > strongest_force.length_squared():
-				strongest_force = force
-				main_body = body
-
-		if strongest_force.length_squared() > 1 and universe.space_ship.grounded:
-			if velocity_from_gravity.length_squared() < 10:
-				velocity_from_gravity += strongest_force
-			
-			var gravity_up = strongest_force.normalized()
-			
-			basis = align_up(basis, gravity_up)
-			
-		else:
-			velocity_from_gravity = Vector3.ZERO
-	if !universe.space_ship.grounded:
-		position = universe.space_ship.player_pos.global_position
-	else:
-		velocity = velocity_from_gravity + velocity_from_movement
+	#if universe.play:
+		#var strongest_force := Vector3.ZERO
+		#for body in bodies:
+			#var sqr_dist = position.distance_squared_to(body.position)
+			#var dir = position.direction_to(body.position)
+			#var force: Vector3 = dir * Universe.G * body.mass / sqr_dist # force = acc cuz mass cancel
+			#if force.length_squared() > strongest_force.length_squared():
+				#strongest_force = force
+				#main_body = body
+#
+		#if strongest_force.length_squared() > 1 and universe.space_ship.grounded:
+			#if velocity_from_gravity.length_squared() < 10:
+				#velocity_from_gravity += strongest_force
+			#
+			#var gravity_up = strongest_force.normalized()
+			#
+			#basis = align_up(basis, gravity_up)
+			#
+		#else:
+			#velocity_from_gravity = Vector3.ZERO
+	#if !universe.space_ship.grounded:
+		#position = universe.space_ship.player_pos.global_position
+	#else:
+		#velocity = velocity_from_gravity + velocity_from_movement
+	handle_movement()
+	velocity = velocity_from_movement
 	move_and_slide()
 	
 func handle_movement():

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dwipajhr0a2xp"]
+[gd_scene format=3 uid="uid://dwipajhr0a2xp"]
 
 [ext_resource type="Script" uid="uid://4n6vrylf8e46" path="res://SpaceShip/spaceship.gd" id="1_a5f6o"]
 
@@ -35,43 +35,45 @@ material = SubResource("StandardMaterial3D_7wmyp")
 radius = 0.05
 section_length = 0.786
 
-[node name="SpaceShip" type="CharacterBody3D"]
+[node name="SpaceShip" type="CharacterBody3D" unique_id=1397739998]
 collision_layer = 2
 motion_mode = 1
 platform_on_leave = 2
 script = ExtResource("1_a5f6o")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2144112547]
 material_override = SubResource("StandardMaterial3D_a5f6o")
 mesh = SubResource("BoxMesh_k0ly7")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=267280968]
 shape = SubResource("BoxShape3D_a5f6o")
 
-[node name="OmniLight3D" type="OmniLight3D" parent="."]
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=374592754]
 transform = Transform3D(0.99909186, 0, -0.042608038, 0, 1, 0, 0.042608038, 0, 0.99909186, 0.0585084, 1.2511338, 1.1244411)
 
-[node name="Cam" type="Node3D" parent="."]
+[node name="Cam" type="Node3D" parent="." unique_id=1130977445]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0877585, 0.95180523)
 
-[node name="Head" type="Node3D" parent="Cam"]
+[node name="Head" type="Node3D" parent="Cam" unique_id=101991551]
 transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.50000006, 0, -0.50000006, 0.8660254, 0, 0, 0)
 
-[node name="Camera3D" type="Camera3D" parent="Cam/Head"]
+[node name="Camera3D" type="Camera3D" parent="Cam/Head" unique_id=1362112486]
 far = 10000.0
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=2112937460]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, -2.1312878)
+visible = false
 mesh = SubResource("TubeTrailMesh_7wmyp")
 
-[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="." unique_id=611274389]
 transform = Transform3D(-4.371139e-08, 1, 4.371139e-08, 0, -4.371139e-08, 1, 1, 4.371139e-08, 1.9106855e-15, 0.6176988, 0, 0)
+visible = false
 mesh = SubResource("TubeTrailMesh_2lyo7")
 
-[node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="." unique_id=1708805461]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1732893, 0)
 visible = false
 mesh = SubResource("TubeTrailMesh_kcnnk")
 
-[node name="Marker3D" type="Marker3D" parent="."]
+[node name="Marker3D" type="Marker3D" parent="." unique_id=901926644]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.60102427, 0)

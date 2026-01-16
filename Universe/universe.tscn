@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://brx4cveefbkom"]
+[gd_scene format=3 uid="uid://brx4cveefbkom"]
 
 [ext_resource type="Script" uid="uid://b5bfgoutmjrax" path="res://Universe/universe.gd" id="1_6q408"]
 [ext_resource type="Texture2D" uid="uid://c3whsjkev0age" path="res://Textures/Sky Panaromas/starmap_g4k.jpg" id="2_5gdbb"]
@@ -67,30 +67,32 @@ height = 30.0
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_p3x1f"]
 
-[node name="Universe" type="Node3D" node_paths=PackedStringArray("central_body")]
+[node name="Universe" type="Node3D" unique_id=1103532325 node_paths=PackedStringArray("central_body")]
 script = ExtResource("1_6q408")
 relative_to_body = true
 central_body = NodePath("HeavenlyBodies/Planet2")
 orbit_mode = 2
 
-[node name="SpaceShip" parent="." node_paths=PackedStringArray("body_containers", "universe") instance=ExtResource("4_5gdbb")]
+[node name="SpaceShip" parent="." unique_id=1686427912 node_paths=PackedStringArray("body_containers", "universe") instance=ExtResource("4_5gdbb")]
 transform = Transform3D(-0.99999994, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0, -0.99999994, -0.037073374, 904.13135, -1503.6288)
+visible = false
 speed = 15.0
 body_containers = NodePath("../HeavenlyBodies")
 universe = NodePath("..")
 
-[node name="Player" parent="." node_paths=PackedStringArray("body_containers", "universe") instance=ExtResource("6_xs1tn")]
+[node name="Player" parent="." unique_id=629926499 node_paths=PackedStringArray("body_containers", "universe") instance=ExtResource("6_xs1tn")]
 transform = Transform3D(-0.39, 0, -3.409488e-08, 0, 0.39, 0, 3.409488e-08, 0, -0.39, -0.046138808, 904.7877, -1503.5511)
-move_speed = 798.9
+visible = true
+move_speed = 1781.0
 body_containers = NodePath("../HeavenlyBodies")
 universe = NodePath("..")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1337710177]
 environment = SubResource("Environment_5gdbb")
 
-[node name="HeavenlyBodies" type="Node3D" parent="."]
+[node name="HeavenlyBodies" type="Node3D" parent="." unique_id=1254415850]
 
-[node name="Star" type="MeshInstance3D" parent="HeavenlyBodies"]
+[node name="Star" type="MeshInstance3D" parent="HeavenlyBodies" unique_id=1292387562]
 material_override = SubResource("StandardMaterial3D_6326s")
 mesh = SubResource("SphereMesh_xs1tn")
 script = ExtResource("4_6326s")
@@ -100,11 +102,11 @@ is_star = true
 fnl = SubResource("FastNoiseLite_xs1tn")
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
-[node name="OmniLight3D" type="OmniLight3D" parent="HeavenlyBodies/Star"]
+[node name="OmniLight3D" type="OmniLight3D" parent="HeavenlyBodies/Star" unique_id=107055754]
 omni_range = 10000.0
 omni_attenuation = 0.072
 
-[node name="Planet" type="MeshInstance3D" parent="HeavenlyBodies"]
+[node name="Planet" type="MeshInstance3D" parent="HeavenlyBodies" unique_id=1994744797]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1714.5422)
 material_override = SubResource("StandardMaterial3D_5w2eq")
 mesh = SubResource("SphereMesh_5w2eq")
@@ -115,7 +117,7 @@ initial_velocity = Vector3(-25.495, 0, 0)
 fnl = SubResource("FastNoiseLite_wn7ko")
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
-[node name="Planet2" type="MeshInstance3D" parent="HeavenlyBodies"]
+[node name="Planet2" type="MeshInstance3D" parent="HeavenlyBodies" unique_id=1462437669]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4310.3574)
 material_override = SubResource("StandardMaterial3D_p3x1f")
 mesh = SubResource("SphereMesh_p3x1f")
@@ -127,7 +129,7 @@ fnl = SubResource("FastNoiseLite_5w2eq")
 height_scale = 10.755
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
-[node name="Moon" type="MeshInstance3D" parent="HeavenlyBodies"]
+[node name="Moon" type="MeshInstance3D" parent="HeavenlyBodies" unique_id=1347366640]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38397217, 0, -4950.073)
 material_override = SubResource("StandardMaterial3D_xs1tn")
 mesh = SubResource("SphereMesh_wn7ko")
@@ -138,4 +140,34 @@ initial_velocity = Vector3(6.235, 0, 0)
 fnl = SubResource("FastNoiseLite_p3x1f")
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
-[node name="Orbits" type="Node3D" parent="."]
+[node name="Orbits" type="Node3D" parent="." unique_id=1279198441]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1785144548]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=1321898572]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/Control" unique_id=690006828]
+texture_filter = 4
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.32243752
+anchor_top = 0.81029636
+anchor_right = 0.71660423
+anchor_bottom = 0.8888889
+offset_left = -0.44802856
+offset_top = -0.072021484
+offset_right = 0.47192383
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "Press P to start gravity"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true

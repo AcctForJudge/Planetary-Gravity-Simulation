@@ -170,7 +170,7 @@ func check_if_grounded(body: HeavenlyBody):
 		grounded = true
 	else:
 		grounded = false
-	print(grounded)
+	#print(grounded)
 	
 	
 	
