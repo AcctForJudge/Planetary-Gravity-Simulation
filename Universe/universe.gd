@@ -207,7 +207,7 @@ func draw_orbits(i: int, draw_points: Array):
 	var curve := Curve3D.new()
 	var c = 0
 	for pos: Vector3 in draw_points[i]:
-		if !pos.is_equal_approx(prev_pos) and c % 2 == 0:
+		if !pos.is_equal_approx(prev_pos) and c % 5 == 0:
 			curve.add_point(pos)
 		c += 1
 		prev_pos = pos

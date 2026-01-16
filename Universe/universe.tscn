@@ -70,8 +70,8 @@ height = 30.0
 [node name="Universe" type="Node3D" unique_id=1103532325 node_paths=PackedStringArray("central_body")]
 script = ExtResource("1_6q408")
 relative_to_body = true
-central_body = NodePath("HeavenlyBodies/Planet2")
-orbit_mode = 2
+central_body = NodePath("HeavenlyBodies/Star")
+orbit_mode = 1
 
 [node name="SpaceShip" parent="." unique_id=1686427912 node_paths=PackedStringArray("body_containers", "universe") instance=ExtResource("4_5gdbb")]
 transform = Transform3D(-0.99999994, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0, -0.99999994, -0.037073374, 904.13135, -1503.6288)
@@ -82,7 +82,6 @@ universe = NodePath("..")
 
 [node name="Player" parent="." unique_id=629926499 node_paths=PackedStringArray("body_containers", "universe") instance=ExtResource("6_xs1tn")]
 transform = Transform3D(-0.39, 0, -3.409488e-08, 0, 0.39, 0, 3.409488e-08, 0, -0.39, -0.046138808, 904.7877, -1503.5511)
-visible = true
 move_speed = 1781.0
 body_containers = NodePath("../HeavenlyBodies")
 universe = NodePath("..")
@@ -107,36 +106,36 @@ omni_range = 10000.0
 omni_attenuation = 0.072
 
 [node name="Planet" type="MeshInstance3D" parent="HeavenlyBodies" unique_id=1994744797]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1714.5422)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 769.4834)
 material_override = SubResource("StandardMaterial3D_5w2eq")
 mesh = SubResource("SphereMesh_5w2eq")
 script = ExtResource("4_6326s")
 mass = 50000.0
 radius = 80.0
-initial_velocity = Vector3(-25.495, 0, 0)
+initial_velocity = Vector3(-36.23, 0, 0)
 fnl = SubResource("FastNoiseLite_wn7ko")
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
 [node name="Planet2" type="MeshInstance3D" parent="HeavenlyBodies" unique_id=1462437669]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4310.3574)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1748.1652)
 material_override = SubResource("StandardMaterial3D_p3x1f")
 mesh = SubResource("SphereMesh_p3x1f")
 script = ExtResource("4_6326s")
 mass = 50000.0
 radius = 100.0
-initial_velocity = Vector3(15.365, 0, 0)
+initial_velocity = Vector3(23.075, 0, 0)
 fnl = SubResource("FastNoiseLite_5w2eq")
 height_scale = 10.755
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
 [node name="Moon" type="MeshInstance3D" parent="HeavenlyBodies" unique_id=1347366640]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38397217, 0, -4950.073)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38397217, 0, -1967.3644)
 material_override = SubResource("StandardMaterial3D_xs1tn")
 mesh = SubResource("SphereMesh_wn7ko")
 script = ExtResource("4_6326s")
 mass = 1000.0
 radius = 15.0
-initial_velocity = Vector3(6.235, 0, 0)
+initial_velocity = Vector3(7.28, 0, 0)
 fnl = SubResource("FastNoiseLite_p3x1f")
 metadata/_custom_type_script = "uid://6ab6gpfo0tx5"
 
