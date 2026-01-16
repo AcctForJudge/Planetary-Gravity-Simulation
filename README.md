@@ -10,4 +10,4 @@ Simulating planetary motion using `F = Gm1m2/(r^2)`. Each body has its own mass 
 H - show/hide orbits
 
 ### Screenshot
-Image from editor (kinda bad) [image](https://github.com/AcctForJudge/Planetary-Gravity-Simulation/blob/main/screenshot.png)
+Image from editor (kinda bad) ![image](https://github.com/AcctForJudge/Planetary-Gravity-Simulation/blob/main/screenshot.png)
